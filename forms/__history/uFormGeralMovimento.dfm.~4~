@@ -1,0 +1,12 @@
+inherited formCadastroMovimento: TformCadastroMovimento
+  Caption = 'M'#243'dulo de movimentos'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited FDQueryCadastro: TFDQuery
+    Active = True
+    SQL.Strings = (
+      
+        'select m.id,m.data,c.nome as conta,m.tipo,m.valor,m.historico fr' +
+        'om movimento m , conta c where c.id = m.conta_id;')
+  end
+end

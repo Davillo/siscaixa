@@ -1,0 +1,95 @@
+inherited formCadastroMovimento: TformCadastroMovimento
+  Caption = 'M'#243'dulo de movimentos'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited dbGridLista: TDBGrid
+    Left = -7
+    Columns = <
+      item
+        Expanded = False
+        FieldName = 'ID'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'DATA'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'CONTA'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'TIPO'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'VALOR'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'HISTORICO'
+        Visible = True
+      end>
+  end
+  inherited panelCad: TPanel
+    inherited BitBtn1: TBitBtn
+      OnClick = BitBtn1Click
+    end
+    inherited BitBtn3: TBitBtn
+      OnClick = BitBtn3Click
+    end
+  end
+  inherited FDQueryCadastro: TFDQuery
+    SQL.Strings = (
+      
+        'select m.id,m.data,c.nome as conta,m.tipo,m.valor,m.historico fr' +
+        'om movimento m , conta c where c.id = m.conta_id;')
+    object FDQueryCadastroID: TIntegerField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object FDQueryCadastroDATA: TDateField
+      FieldName = 'DATA'
+      Origin = '"DATA"'
+      Required = True
+    end
+    object FDQueryCadastroCONTA: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'CONTA'
+      Origin = 'NOME'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 50
+    end
+    object FDQueryCadastroTIPO: TStringField
+      FieldName = 'TIPO'
+      Origin = 'TIPO'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object FDQueryCadastroVALOR: TSingleField
+      FieldName = 'VALOR'
+      Origin = 'VALOR'
+      Required = True
+    end
+    object FDQueryCadastroHISTORICO: TStringField
+      FieldName = 'HISTORICO'
+      Origin = 'HISTORICO'
+      Required = True
+      Size = 255
+    end
+  end
+  object FDQueryDeleteMov: TFDQuery
+    Connection = dmDados.FDConexao
+    Left = 432
+    Top = 120
+  end
+end

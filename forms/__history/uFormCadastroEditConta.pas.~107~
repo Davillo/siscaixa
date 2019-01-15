@@ -1,0 +1,213 @@
+unit uFormCadastroEditConta;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.DBCtrls,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client;
+
+type
+  TformCadastroEditConta = class(TForm)
+    labelGrupoConta1: TLabel;
+    edtCodigoconta: TEdit;
+    labelCodConta1: TLabel;
+    cbTipoConta: TComboBox;
+    labelTipoConta1: TLabel;
+    edtNomeConta: TEdit;
+    labelNomeConta1: TLabel;
+    btnSalvarConta: TButton;
+    FDQueryContas: TFDQuery;
+    FDQueryGetGeneratorConta: TFDQuery;
+    dsCadastroConta: TDataSource;
+    DBLookupCBGrupo: TDBLookupComboBox;
+    FDQueryContasID: TIntegerField;
+    FDQueryContasNOME: TStringField;
+    FDQueryContasGRUPO_ID: TIntegerField;
+    FDQueryContasTIPO: TStringField;
+    FDQueryGruposContas: TFDQuery;
+    procedure FormShow(Sender: TObject);
+    procedure btnSalvarContaClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure DBLookupCBGrupoClick(Sender: TObject);
+  private
+    { Private declarations }
+    function returnTipoConta : string;
+    procedure atualizarGridContas;
+    function validateSavedAccount(conta : string) : boolean;
+
+  public
+    { Public declarations }
+    codGrupo : integer;
+    isEdit : boolean;
+  end;
+
+var
+  formCadastroEditConta: TformCadastroEditConta;
+
+implementation
+
+{$R *.dfm}
+
+uses uLookup, uDmDados, uBiblioteca, uFormGeralConta;
+
+procedure TformCadastroEditConta.atualizarGridContas;
+begin
+ formGeralConta.FDQueryCadastro.close();
+  formGeralConta.FDQueryCadastro.Open();
+end;
+
+procedure TformCadastroEditConta.btnSalvarContaClick(Sender: TObject);
+begin
+
+ if validateIsEmptyString(edtNomeConta.Text) and (cbTipoConta.Text <> '') and (DBLookupCBGrupo.Text <> '') then
+ begin
+      if validateSavedAccount(edtNomeConta.Text) then begin
+      end;
+
+     if not isEdit then begin
+
+        try
+        with FDQueryContas do begin
+         Close;
+         SQL.Clear;
+         SQL.Text := 'INSERT INTO CONTA (NOME,GRUPO_ID,TIPO) VALUES (:NOME,:GRUPO_ID,:TIPO)';
+         ParamByName('NOME').AsString := edtNomeConta.Text;
+         ParamByName('GRUPO_ID').AsInteger := codGrupo;
+         ParamByName('TIPO').AsString  := returnTipoConta;
+         ExecSQL;
+        end;
+
+         ShowMessage('Salvo com sucesso');
+         atualizarGridContas;
+
+        if Application.MessageBox('Deseja cadastrar uma nova conta?', '',
+          MB_YESNO + MB_SYSTEMMODAL + MB_ICONQUESTION + MB_DEFBUTTON1) = ID_YES
+        then
+        begin
+          formCadastroEditConta.Close;
+          formCadastroEditConta.Free;
+
+          formCadastroEditConta := TformCadastroEditConta.Create(nil);
+          formCadastroEditConta.ShowModal;
+
+
+        end// fim do if - yes
+        else
+        begin
+          formCadastroEditConta.Close;
+        end; //fim do else - no
+
+        except on e:exception do begin
+          ShowMessage('Ocorreu um erro ao editar a conta. '+e.Message);
+        end;
+
+        end;
+
+
+     end
+
+     else
+     begin
+     try
+     with FDQueryContas do begin
+        Close;
+        sql.clear;
+        sql.Text := 'UPDATE CONTA SET nome = :nome, grupo_id = :grupo_id, tipo = :tipo WHERE id = :id';//update
+        ParamByName('id').AsInteger := StrToInt(edtCodigoconta.Text);
+        ParamByName('NOME').AsString := edtNomeConta.Text;
+        ParamByName('GRUPO_ID').AsInteger := codGrupo;
+        ParamByName('TIPO').AsString  := returnTipoConta;
+        ExecSQL;
+
+     end;
+        atualizarGridContas;
+        ShowMessage('Salvo com sucesso');
+     except on e:exception do begin
+        ShowMessage('Ocorreu um erro ao editar a conta. '+e.Message);
+     end;
+
+     end;
+
+     end;
+ end
+
+ else
+ begin
+  ShowMessage('Preencha os campos obrigatórios.');
+ end;
+
+end;
+
+procedure TformCadastroEditConta.DBLookupCBGrupoClick(Sender: TObject);
+begin
+  with FDQueryGruposContas do begin
+  Close;
+  SQL.Clear;
+  SQL.Text := 'SELECT id FROM grupo WHERE nome ='+QuotedStr(DBLookupCBGrupo.Text);
+  Open();
+  codGrupo := Fields[0].AsInteger;
+end;
+
+end;
+
+procedure TformCadastroEditConta.FormCreate(Sender: TObject);
+begin
+
+with dmLookup,FDQueryGrupos do begin
+ Close;
+ Open();
+ FetchAll;
+end;
+
+end;
+
+procedure TformCadastroEditConta.FormShow(Sender: TObject);
+var proximoCod : integer;
+begin
+
+    if not isEdit then begin
+      with FDQueryGetGeneratorConta do begin
+       SQL.Text := 'SELECT GEN_ID(GEN_CONTA_ID, 0) FROM RDB$DATABASE';
+       Open();
+       proximoCod := (Fields[0].AsInteger) + 1;
+       edtCodigoconta.Text := IntToStr(proximoCod);
+      end;
+
+    end;
+
+    with dmLookup,FDQueryGrupos do begin
+      Close;
+      Open();
+      FetchAll;
+    end;
+
+end;
+
+function TformCadastroEditConta.returnTipoConta: string;
+begin
+
+if cbTipoConta.Text = 'RECEITA' then  begin
+  result := 'R';
+end
+else
+  result := 'D';
+end;
+
+function TformCadastroEditConta.validateSavedAccount(conta: string): boolean;
+begin
+
+  if FDQueryContas.Locate('nome', edtNomeConta.Text, []) then begin
+      ShowMessage('Conta já cadastrada!');
+      edtNomeConta.Text := '';
+      result := false;
+      abort;
+  end
+  else
+      result := true;
+end;
+
+end.

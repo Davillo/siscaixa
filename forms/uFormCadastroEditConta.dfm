@@ -1,0 +1,160 @@
+object formCadastroEditConta: TformCadastroEditConta
+  Left = 0
+  Top = 0
+  Caption = 'Cadastro de Contas'
+  ClientHeight = 190
+  ClientWidth = 446
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnCreate = FormCreate
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object labelGrupoConta1: TLabel
+    Left = 64
+    Top = 69
+    Width = 37
+    Height = 13
+    Caption = 'Grupo:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object labelCodConta1: TLabel
+    Left = 64
+    Top = 7
+    Width = 37
+    Height = 13
+    Caption = 'C'#243'digo:'
+  end
+  object labelTipoConta1: TLabel
+    Left = 264
+    Top = 7
+    Width = 80
+    Height = 13
+    Caption = 'Tipo de Conta:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object labelNomeConta1: TLabel
+    Left = 264
+    Top = 69
+    Width = 87
+    Height = 13
+    Caption = 'Nome da conta:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object edtCodigoconta: TEdit
+    Left = 64
+    Top = 26
+    Width = 57
+    Height = 21
+    Enabled = False
+    TabOrder = 0
+  end
+  object cbTipoConta: TComboBox
+    Left = 264
+    Top = 26
+    Width = 145
+    Height = 21
+    CharCase = ecUpperCase
+    TabOrder = 1
+    Items.Strings = (
+      'DESPESA'
+      'RECEITA')
+  end
+  object edtNomeConta: TEdit
+    Left = 264
+    Top = 88
+    Width = 145
+    Height = 21
+    TabOrder = 2
+  end
+  object btnSalvarConta: TButton
+    Left = 192
+    Top = 148
+    Width = 75
+    Height = 25
+    Caption = 'Salvar'
+    TabOrder = 3
+    OnClick = btnSalvarContaClick
+  end
+  object DBLookupCBGrupo: TDBLookupComboBox
+    Left = 8
+    Top = 88
+    Width = 161
+    Height = 21
+    DataField = 'GRUPO_ID'
+    DataSource = dsCadastroConta
+    KeyField = 'ID'
+    ListField = 'NOME'
+    ListSource = dmLookup.dsGrupos
+    TabOrder = 4
+    OnClick = DBLookupCBGrupoClick
+  end
+  object FDQueryContas: TFDQuery
+    Active = True
+    Connection = dmDados.FDConexao
+    SQL.Strings = (
+      'select * from conta;')
+    Left = 312
+    Top = 120
+    object FDQueryContasID: TIntegerField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object FDQueryContasNOME: TStringField
+      FieldName = 'NOME'
+      Origin = 'NOME'
+      Required = True
+      Size = 50
+    end
+    object FDQueryContasGRUPO_ID: TIntegerField
+      FieldName = 'GRUPO_ID'
+      Origin = 'GRUPO_ID'
+      Required = True
+    end
+    object FDQueryContasTIPO: TStringField
+      FieldName = 'TIPO'
+      Origin = 'TIPO'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+  end
+  object FDQueryGetGeneratorConta: TFDQuery
+    Connection = dmDados.FDConexao
+    Left = 64
+    Top = 136
+  end
+  object dsCadastroConta: TDataSource
+    DataSet = FDQueryContas
+    Left = 216
+    Top = 96
+  end
+  object FDQueryGruposContas: TFDQuery
+    Connection = dmDados.FDConexao
+    Left = 392
+    Top = 136
+  end
+end

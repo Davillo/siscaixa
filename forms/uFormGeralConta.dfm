@@ -1,0 +1,100 @@
+inherited formGeralConta: TformGeralConta
+  Caption = 'M'#243'dulo de contas'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited dbGridLista: TDBGrid
+    Columns = <
+      item
+        Expanded = False
+        FieldName = 'ID'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'NOME'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'TIPO'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'GRUPO'
+        Visible = True
+      end>
+  end
+  inherited panelCad: TPanel
+    inherited BitBtn1: TBitBtn
+      OnClick = BitBtn1Click
+    end
+    inherited BitBtn2: TBitBtn
+      OnClick = BitBtn2Click
+    end
+    inherited BitBtn3: TBitBtn
+      OnClick = BitBtn3Click
+    end
+  end
+  inherited FDQueryCadastro: TFDQuery
+    Active = True
+    UpdateObject = nil
+    SQL.Strings = (
+      
+        'select c.id,c.nome, g.nome as grupo ,case c.tipo when '#39'R'#39' then '#39 +
+        'Receita'#39' else '#39'Despesa'#39' end as Tipo from conta c, grupo g where ' +
+        'c.grupo_id = g.id;')
+    Left = 464
+    Top = 144
+    object FDQueryCadastroID: TIntegerField
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object FDQueryCadastroNOME: TStringField
+      FieldName = 'NOME'
+      Origin = 'NOME'
+      Required = True
+      Size = 50
+    end
+    object FDQueryCadastroGRUPO: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'GRUPO'
+      Origin = 'NOME'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 50
+    end
+    object FDQueryCadastroTIPO: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'TIPO'
+      Origin = 'TIPO'
+      ProviderFlags = []
+      ReadOnly = True
+      FixedChar = True
+      Size = 7
+    end
+  end
+  inherited FDUpdateCadastro: TFDUpdateSQL
+    Left = 304
+    Top = 144
+  end
+  inherited dsCadastro: TDataSource
+    Left = 384
+    Top = 144
+  end
+  object FDQueryDeleteConta: TFDQuery
+    Connection = dmDados.FDConexao
+    Left = 80
+    Top = 144
+  end
+  object FDQuerySelectIdGrupo: TFDQuery
+    Active = True
+    Connection = dmDados.FDConexao
+    SQL.Strings = (
+      'select * from grupo')
+    Left = 192
+    Top = 144
+  end
+end

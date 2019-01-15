@@ -1,0 +1,41 @@
+object formConfigurarBase: TformConfigurarBase
+  Left = 0
+  Top = 0
+  Caption = 'Problema ao conectar-se com o banco de dados'
+  ClientHeight = 101
+  ClientWidth = 534
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object edtCaminhoBase: TEdit
+    Left = 136
+    Top = 64
+    Width = 209
+    Height = 21
+    TabOrder = 0
+  end
+  object btnConfigurarBase: TButton
+    Left = 351
+    Top = 62
+    Width = 75
+    Height = 25
+    Caption = 'Configurar'
+    TabOrder = 1
+    OnClick = btnConfigurarBaseClick
+  end
+  object opnPastas: TOpenDialog
+    FileName = 
+      'C:\Users\Programa'#231#227'o-08\Documents\Embarcadero\Studio\Projects\Pr' +
+      'ojetoCaixa\database\DADOS.FDB'
+    Filter = 'firebird|*.fdb'
+    Left = 192
+    Top = 16
+  end
+end
