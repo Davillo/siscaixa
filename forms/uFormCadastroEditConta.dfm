@@ -90,7 +90,7 @@ object formCadastroEditConta: TformCadastroEditConta
   end
   object btnSalvarConta: TButton
     Left = 192
-    Top = 148
+    Top = 157
     Width = 75
     Height = 25
     Caption = 'Salvar'

@@ -1,0 +1,21 @@
+object dmDados: TdmDados
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 196
+  Width = 661
+  object FDConexao: TFDConnection
+    Params.Strings = (
+      
+        'Database=C:\Users\Programa'#231#227'o-08\Documents\Embarcadero\Studio\Pr' +
+        'ojects\ProjetoCaixa\database\DADOS.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'Port=3050'
+      'Protocol=TCPIP'
+      'Server=localhost'
+      'DriverID=FB')
+    LoginPrompt = False
+    Left = 256
+    Top = 80
+  end
+end

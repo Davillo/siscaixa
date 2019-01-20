@@ -115,7 +115,7 @@ begin
           atualizarDbGrid;
           self.Close;
         except on e:exception do begin
-            ShowMessage('Grupo já cadastrado.');
+           // ShowMessage('Grupo já cadastrado.');
             ShowMessage('Mensagem original:'+e.Message);
         end;
 

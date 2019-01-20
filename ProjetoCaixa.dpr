@@ -24,7 +24,5 @@ begin
   Application.CreateForm(TformPrincipal, formPrincipal);
   Application.CreateForm(TformConfigurarBase, formConfigurarBase);
   Application.CreateForm(TdmLookup, dmLookup);
-  Application.CreateForm(TformCadastroMovimento, formCadastroMovimento);
-  Application.CreateForm(TformCadastroEditMovimento, formCadastroEditMovimento);
   Application.Run;
 end.

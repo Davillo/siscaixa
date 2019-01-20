@@ -93,4 +93,9 @@ inherited formModuloGrupos: TformModuloGrupos
       Size = 50
     end
   end
+  object FDQueryCheck: TFDQuery
+    Connection = dmDados.FDConexao
+    Left = 432
+    Top = 136
+  end
 end

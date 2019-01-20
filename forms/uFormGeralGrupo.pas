@@ -18,6 +18,7 @@ type
     FDQueryDelete: TFDQuery;
     FDQueryDeleteID: TIntegerField;
     FDQueryDeleteNOME: TStringField;
+    FDQueryCheck: TFDQuery;
     procedure BitBtn1Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
@@ -26,6 +27,7 @@ type
   private
     { Private declarations }
     procedure atualizarDbGrid;
+    procedure checkGroupInAccount;
   public
     { Public declarations }
   end;
@@ -94,6 +96,7 @@ begin
           MB_YESNO + MB_SYSTEMMODAL + MB_ICONQUESTION + MB_DEFBUTTON1) = ID_YES
         then
         begin
+          checkGroupInAccount;
             try
               FDQueryDelete.Close;
               FDQueryDelete.sql.Clear;
@@ -104,8 +107,7 @@ begin
               atualizarDbGrid;
             except
                 on e: exception do begin
-                  Writeln(e.Message);
-                  ShowMessage('Não foi possível excluir este grupo, existem contas vinculadas ao mesmo.');
+                  ShowMessage('Não foi possível excluir este grupo. MSG ORIGINAL:'+e.Message);
                 end;
             end;
 
@@ -116,6 +118,24 @@ begin
 
         end; //fim do else - no
 
+
+end;
+
+procedure TformModuloGrupos.checkGroupInAccount;
+var result : integer;
+begin
+
+  with FDQueryCheck do begin
+    close;
+    SQL.Text := 'SELECT * FROM CONTA WHERE GRUPO_ID = '+inttostr(FDQueryCadastro.FieldByName('ID').AsInteger);
+    open;
+
+     if (FDQueryCheck.RowsAffected > 0) then begin
+       ShowMessage('Não é possível excluir este grupo, o mesmo está vinculado a uma conta existente.');
+       abort;
+     end;
+
+  end;
 
 end;
 

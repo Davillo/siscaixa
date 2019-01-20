@@ -18,6 +18,7 @@ type
     FDQueryCadastroNOME: TStringField;
     FDQueryCadastroGRUPO: TStringField;
     FDQueryCadastroTIPO: TStringField;
+    FDQueryCheck: TFDQuery;
     procedure BitBtn3Click(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
@@ -26,6 +27,7 @@ type
     { Private declarations }
     procedure atualizarDbGrid;
     procedure setEditConta;
+    procedure checkAccountInMovs;
     function returnTipoContaEdit(value : string) : string;
   public
     { Public declarations }
@@ -78,6 +80,7 @@ begin
           MB_YESNO + MB_SYSTEMMODAL + MB_ICONQUESTION + MB_DEFBUTTON1) = ID_YES
         then
         begin
+            checkAccountInMovs;
             try
               FDQueryDeleteConta.Close;
               FDQueryDeleteConta.sql.Clear;
@@ -103,6 +106,22 @@ begin
 end;
 
 
+
+procedure TformGeralConta.checkAccountInMovs;
+begin
+
+   with FDQueryCheck do begin
+      close;
+      sql.Text := 'SELECT CONTA_ID FROM MOVIMENTO WHERE CONTA_ID = '+IntToStr(FDQueryCadastro.FieldByName('ID').AsInteger);
+      open;
+      if RowsAffected > 0 then begin
+        ShowMessage('Não é possível excluir esta conta, a mesma está vinculada a movimentos existentes.');
+        abort;
+      end;
+
+
+   end;
+end;
 
 function TformGeralConta.returnTipoContaEdit(value : string) : string;
 begin
@@ -142,5 +161,7 @@ begin
     FreeAndNil(formCadastroEditConta);
   end;
 end;
+
+
 
 end.

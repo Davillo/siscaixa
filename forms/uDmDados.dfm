@@ -6,8 +6,8 @@ object dmDados: TdmDados
   object FDConexao: TFDConnection
     Params.Strings = (
       
-        'Database=C:\Users\Programa'#231#227'o-08\Documents\Embarcadero\Studio\Pr' +
-        'ojects\ProjetoCaixa\database\DADOS.FDB'
+        'Database=D:\workdir\delphi\ProjetoCaixa\siscaixa\database\DADOSN' +
+        'OVO.FDB'
       'User_Name=SYSDBA'
       'Password=masterkey'
       'Port=3050'

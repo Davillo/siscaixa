@@ -125,8 +125,8 @@ begin
           atualizarGridContas;
           ShowMessage('Salvo com sucesso');
         except on e:exception do
-          ShowMessage('Conta já cadastrada');
-          //ShowMessage('msg original:'+e.message);
+         // ShowMessage('Conta já cadastrada');
+          ShowMessage('msg original:'+e.message);
         end;
 
         end;

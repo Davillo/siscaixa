@@ -31,6 +31,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
     procedure DBLookupContasClick(Sender: TObject);
+    procedure edtValorKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
      procedure atualizaDbGrid;
@@ -56,8 +57,9 @@ uses uDmDados, uLookup, uBiblioteca, uFormGeralMovimento;
 
 procedure TformCadastroEditMovimento.atualizaDbGrid;
 begin
+ formCadastroMovimento.FDQueryCadastro.close();
   formCadastroMovimento.FDQueryCadastro.Open();
-  formCadastroMovimento.FDQueryCadastro.close();
+
 end;
 
 procedure TformCadastroEditMovimento.btnSalvarClick(Sender: TObject);
@@ -74,9 +76,28 @@ begin
       ParamByName('CONTA_ID').AsInteger := codConta;
       ParamByName('TIPO').AsString := returnTipo(cbTipo.Text);
       ParamByName('HISTORICO').AsString := edtHistorico.Text;
-      ParamByName('VALOR').AsFloat := strtofloat(edtValor.Text);
+      ParamByName('VALOR').AsFloat := strtofloat(FormatFloat('#0.00',strtofloat(edtValor.Text)));
       ExecSQL;
       ShowMessage('Salvo com sucesso');
+
+             if Application.MessageBox('Deseja cadastrar um novo movimento?', '',
+          MB_YESNO + MB_SYSTEMMODAL + MB_ICONQUESTION + MB_DEFBUTTON1) = ID_YES
+        then
+        begin
+          formCadastroEditMovimento.Close;
+          formCadastroEditMovimento.Free;
+
+          formCadastroEditMovimento := TformCadastroEditMovimento.Create(nil);
+          formCadastroEditMovimento.ShowModal;
+          atualizaDbGrid;
+
+        end// fim do if - yes
+        else
+        begin
+          formCadastroEditMovimento.Close;
+          atualizaDbGrid;
+        end; //fim do else - no
+
       end
       else begin
       Close;
@@ -132,12 +153,19 @@ begin
 
 end;
 
+procedure TformCadastroEditMovimento.edtValorKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+     if not (key in ['0'..'9',',',#8]) then key :=#0;
+end;
+
 procedure TformCadastroEditMovimento.FormCreate(Sender: TObject);
 var
   proximoCod: integer;
 begin
 if not isEdit then
 begin
+  edtData.Text := DateToStr(date); //seta a data no field com a data atual.
   with FDQueryGenerator do
   begin
    FDQueryGenerator.Close;

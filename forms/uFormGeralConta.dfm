@@ -97,4 +97,9 @@ inherited formGeralConta: TformGeralConta
     Left = 192
     Top = 144
   end
+  object FDQueryCheck: TFDQuery
+    Connection = dmDados.FDConexao
+    Left = 520
+    Top = 96
+  end
 end

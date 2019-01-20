@@ -140,6 +140,7 @@ object formCadastroEditMovimento: TformCadastroEditMovimento
     Width = 121
     Height = 21
     TabOrder = 5
+    OnKeyPress = edtValorKeyPress
   end
   object edtData: TMaskEdit
     Left = 112

@@ -1,0 +1,193 @@
+unit uFormCadastroEditMovimento;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBCtrls, Vcl.StdCtrls, Vcl.Mask;
+
+type
+  TformCadastroEditMovimento = class(TForm)
+    FDQueryMovimentos: TFDQuery;
+    dsCadastro: TDataSource;
+    FDQueryGenerator: TFDQuery;
+    edtCodigo: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    DBLookupContas: TDBLookupComboBox;
+    Label3: TLabel;
+    cbTipo: TComboBox;
+    Label4: TLabel;
+    Label5: TLabel;
+    edtHistorico: TEdit;
+    Label6: TLabel;
+    btnSalvar: TButton;
+    edtValor: TEdit;
+    edtData: TMaskEdit;
+    FDQueryContas: TFDQuery;
+    procedure FormCreate(Sender: TObject);
+    procedure btnSalvarClick(Sender: TObject);
+    procedure DBLookupContasClick(Sender: TObject);
+    procedure edtValorKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+     procedure atualizaDbGrid;
+     procedure validateFieldSize;
+  public
+    { Public declarations }
+     isEdit : boolean;
+     function returnTipo(tipo : string) : string;
+
+  end;
+
+
+var
+  formCadastroEditMovimento: TformCadastroEditMovimento;
+  codConta : integer;
+
+
+implementation
+
+{$R *.dfm}
+
+uses uDmDados, uLookup, uBiblioteca, uFormGeralMovimento;
+
+procedure TformCadastroEditMovimento.atualizaDbGrid;
+begin
+  formCadastroMovimento.FDQueryCadastro.Open();
+  formCadastroMovimento.FDQueryCadastro.close();
+end;
+
+procedure TformCadastroEditMovimento.btnSalvarClick(Sender: TObject);
+begin
+  if validateIsEmptyString(edtData.Text) and validateIsEmptyString(edtValor.Text) and (validateIsEmptyString(edtHistorico.Text)) and validateIsEmptyString(cbTipo.Text) and validateIsEmptyString(DBLookupContas.Text) then begin
+    validateFieldSize;
+    try
+    with FDQueryMovimentos do begin
+    if not isEdit then begin
+      Close;
+      SQL.Clear;
+      SQL.Text := 'INSERT INTO MOVIMENTO (DATA,CONTA_ID,TIPO,VALOR,HISTORICO) VALUES (:DATA,:CONTA_ID,:TIPO,:VALOR,:HISTORICO)';
+      ParamByName('DATA').AsDate := StrToDate(edtData.Text);
+      ParamByName('CONTA_ID').AsInteger := codConta;
+      ParamByName('TIPO').AsString := returnTipo(cbTipo.Text);
+      ParamByName('HISTORICO').AsString := edtHistorico.Text;
+      ParamByName('VALOR').AsFloat := strtofloat(FormatFloat('#0.00',edtValor.Text));
+
+      ExecSQL;
+      ShowMessage('Salvo com sucesso');
+      end
+      else begin
+      Close;
+      SQL.Clear;
+      SQL.Text := 'UPDATE MOVIMENTO SET DATA = :DATA, CONTA_ID = :CONTA_ID, TIPO = :TIPO,HISTORICO = :HISTORICO,VALOR = :VALOR WHERE ID = :ID';
+      ParamByName('ID').AsInteger := strtoint(edtCodigo.Text);
+      ParamByName('DATA').AsDate := StrToDate(edtData.Text);
+      ParamByName('CONTA_ID').AsInteger := codConta;
+      ParamByName('TIPO').AsString := returnTipo(cbTipo.Text);
+      ParamByName('HISTORICO').AsString := edtHistorico.Text;
+      ParamByName('VALOR').AsFloat := strtofloat(edtValor.Text);
+      ExecSQL;
+       ShowMessage('Salvo com sucesso');
+      end;
+    end;
+        atualizaDbGrid;
+
+
+    except on e:exception do begin
+      ShowMessage(e.Message);
+    end;
+
+    end;
+
+
+
+  end
+
+  else
+  begin
+    ShowMessage('Preencha todos os campos em negrito.');
+  end;
+
+end;
+
+procedure TformCadastroEditMovimento.DBLookupContasClick(Sender: TObject);
+  var  tipo: string;
+begin
+  FDQueryContas.Close;
+  FDQueryContas.SQL.Clear;
+  FDQueryContas.SQL.Text := 'SELECT id,tipo FROM CONTA WHERE nome = :nome';
+  FDQueryContas.ParamByName('nome').AsString := DBLookupContas.Text;
+  FDQueryContas.Open();
+  tipo := FDQueryContas.Fields[1].AsString;
+  if tipo = ('R') then begin
+    cbTipo.Text := 'Entrada';
+  end
+  else
+    cbTipo.Text := 'Saída';
+
+
+  codConta := FDQueryContas.Fields[0].AsInteger;
+
+end;
+
+procedure TformCadastroEditMovimento.edtValorKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+     if not (key in ['0'..'9',',',#8]) then key :=#0;
+end;
+
+procedure TformCadastroEditMovimento.FormCreate(Sender: TObject);
+var
+  proximoCod: integer;
+begin
+if not isEdit then
+begin
+  edtData.Text := DateToStr(date); //seta a data no field com a data atual.
+  with FDQueryGenerator do
+  begin
+   FDQueryGenerator.Close;
+   FDQueryGenerator.SQL.Clear;
+   FDQueryGenerator.SQL.Text := 'SELECT GEN_ID(GEN_MOVIMENTO_ID, 0) FROM RDB$DATABASE';
+   FDQueryGenerator.Open();
+   proximoCod := (FDQueryGenerator.Fields[0].AsInteger) + 1;
+   edtCodigo.Text := IntToStr(proximoCod);
+  end;
+end
+
+
+else
+  begin
+
+  end;
+  dmLookup.FDQueryContas.Open();
+  dmLookup.FDQueryContas.FetchAll;
+
+end;
+
+function TformCadastroEditMovimento.returnTipo(tipo: string): string;
+begin
+  if tipo = ('Entrada') then begin
+    result := 'E';
+  end
+  else
+    result := 'S';
+
+end;
+
+procedure TformCadastroEditMovimento.validateFieldSize;
+begin
+  if edtHistorico.GetTextLen >=200 then begin
+    ShowMessage('Histórico maior que o permitido, tamanho máximo : 200');
+    abort;
+  end;
+
+
+
+
+end;
+
+end.
